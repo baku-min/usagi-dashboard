@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { useTasks, useCreateTask, useUpdateTask } from '@/hooks/useTasks';
@@ -23,15 +23,16 @@ export default function DashboardPage() {
 
   const isManager = user?.role === 'manager';
 
+  useEffect(() => {
+    if (!user) router.push('/login');
+  }, [user, router]);
+
   const filtered = useMemo(
     () => filter === 'all' ? tasks : tasks.filter(t => t.status === filter),
     [tasks, filter]
   );
 
-  if (!user) {
-    router.push('/login');
-    return null;
-  }
+  if (!user) return null;
 
   function openAdd() { setEditTarget(null); setModalOpen(true); }
   function openEdit(t: Task) { setEditTarget(t); setModalOpen(true); }
